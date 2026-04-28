@@ -49,6 +49,9 @@ type Output = mmtypes.OutputItem
 type OutputContent = mmtypes.OutputContent
 type Usage = mmtypes.Usage
 type APIError = mmtypes.APIError
+type ModalModelSearchParams = mmtypes.ModelSearchParams
+type ModalModelSearchResponse = mmtypes.ModelSearchResponse
+type ModalModelSearchHit = mmtypes.ModelSearchHit
 
 func (r TaskCreateRequest) Raw() JSONMap {
 	body := JSONMap{

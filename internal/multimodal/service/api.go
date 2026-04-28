@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 
 	mmtypes "github.com/seaart/sa-go/internal/multimodal/types"
 	"github.com/seaart/sa-go/internal/shared"
@@ -11,8 +14,10 @@ import (
 )
 
 const (
-	PathGeneration = "/v1/generation"
-	PathTask       = "/v1/generation/task/"
+	PathGeneration       = "/v1/generation"
+	PathTask             = "/v1/generation/task/"
+	PathModelSkillSearch = "/v1/models/skill/search"
+	PathModelSkill       = "/v1/models/skill/"
 )
 
 func CreateTask(client *transport.Client, ctx context.Context, body any, headers http.Header) (*mmtypes.GenerationResponse, error) {
@@ -48,6 +53,75 @@ func GetTask(client *transport.Client, ctx context.Context, taskID string, heade
 		return nil, err
 	}
 	return &resp, nil
+}
+
+func SearchModels(client *transport.Client, ctx context.Context, params mmtypes.ModelSearchParams, headers http.Header) (*mmtypes.ModelSearchResponse, error) {
+	status, payload, err := client.Request(ctx, http.MethodGet, PathModelSkillSearch+modelSearchQuery(params), nil, withDefaultHeader(headers, "Accept", "application/json"))
+	if err != nil {
+		return nil, err
+	}
+	if status >= 400 {
+		return nil, httpError(status, payload)
+	}
+
+	var resp mmtypes.ModelSearchResponse
+	if err := decode(payload, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func GetModelSkill(client *transport.Client, ctx context.Context, model string, headers http.Header) (string, error) {
+	model = strings.TrimSpace(model)
+	if model == "" {
+		return "", &shared.Error{Kind: shared.ErrGeneral, Message: "model is required"}
+	}
+
+	status, payload, err := client.Request(ctx, http.MethodGet, PathModelSkill+url.PathEscape(model), nil, withDefaultHeader(headers, "Accept", "application/json"))
+	if err != nil {
+		return "", err
+	}
+	if status >= 400 {
+		return "", httpError(status, payload)
+	}
+
+	return string(payload), nil
+}
+
+func modelSearchQuery(params mmtypes.ModelSearchParams) string {
+	values := url.Values{}
+	values.Set("q", params.Query)
+	if params.Input != "" {
+		values.Set("input", params.Input)
+	}
+	if params.Output != "" {
+		values.Set("output", params.Output)
+	}
+	if params.Type != "" {
+		values.Set("type", params.Type)
+	}
+	if params.Provider != "" {
+		values.Set("provider", params.Provider)
+	}
+	if params.Limit > 0 {
+		values.Set("limit", strconv.Itoa(params.Limit))
+	}
+	return "?" + values.Encode()
+}
+
+func withDefaultHeader(headers http.Header, key, value string) http.Header {
+	if headers.Get(key) != "" {
+		return headers
+	}
+
+	cloned := make(http.Header, len(headers)+1)
+	for name, values := range headers {
+		for _, v := range values {
+			cloned.Add(name, v)
+		}
+	}
+	cloned.Set(key, value)
+	return cloned
 }
 
 func httpError(status int, payload []byte) error {

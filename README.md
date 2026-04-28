@@ -65,6 +65,9 @@ if err != nil {
 - `client.Modal.Create(...)`
 - `client.Modal.Get(...)`
 - `client.Modal.Wait(...)`
+- `client.Modal.ListModels(...)`
+- `client.Modal.SearchModels(...)`
+- `client.Modal.GetModelSkill(...)`
 - `task.Wait(...)`
 
 ### 原始透传请求
@@ -148,6 +151,42 @@ if err != nil {
 - Modal 核心层只做请求透传和任务生命周期管理
 - 不在核心层维护 provider 参数枚举
 - 不暴露 provider-specific builder
+
+### 模型列表和参数详情
+
+列表接口复用 `ModelBaseURL`，对应 `GET /v1/models/skill/search`：
+
+```go
+models, err := client.Modal.ListModels(ctx, sa.ModalModelSearchParams{
+    Query: "",
+    Limit: 2,
+})
+if err != nil {
+    log.Fatal(err)
+}
+for _, hit := range models.Hits {
+    fmt.Println(hit["name"])
+}
+```
+
+可选筛选参数：
+
+- `Query` -> `q`
+- `Input` -> `input`
+- `Output` -> `output`
+- `Type` -> `type`
+- `Provider` -> `provider`
+- `Limit` -> `limit`
+
+参数详情接口对应 `GET /v1/models/skill/{model}`，返回 markdown 文本：
+
+```go
+skill, err := client.Modal.GetModelSkill(ctx, "alibaba_animate_anyone_detect")
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(skill)
+```
 
 ## Passthrough API
 

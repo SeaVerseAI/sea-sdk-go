@@ -108,6 +108,157 @@ func TestMediaGet_ReturnsTask(t *testing.T) {
 	}
 }
 
+func TestModalListModels_SearchesSkillModels(t *testing.T) {
+	_, client := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		if r.URL.Path != "/v1/models/skill/search" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer test-key" {
+			t.Fatalf("unexpected authorization: %s", got)
+		}
+		if got := r.Header.Get("Accept"); got != "application/json" {
+			t.Fatalf("unexpected accept: %s", got)
+		}
+
+		query := r.URL.Query()
+		if query.Get("q") != "animate" {
+			t.Fatalf("unexpected q: %s", query.Get("q"))
+		}
+		if query.Get("input") != "image" {
+			t.Fatalf("unexpected input: %s", query.Get("input"))
+		}
+		if query.Get("output") != "video" {
+			t.Fatalf("unexpected output: %s", query.Get("output"))
+		}
+		if query.Get("type") != "i2v" {
+			t.Fatalf("unexpected type: %s", query.Get("type"))
+		}
+		if query.Get("provider") != "alibaba" {
+			t.Fatalf("unexpected provider: %s", query.Get("provider"))
+		}
+		if query.Get("limit") != "2" {
+			t.Fatalf("unexpected limit: %s", query.Get("limit"))
+		}
+
+		writeJSON(w, 200, map[string]any{
+			"hits": []map[string]any{
+				{
+					"id":            "alibaba_animate_anyone_detect",
+					"name":          "alibaba_animate_anyone_detect",
+					"provider":      "alibaba",
+					"input":         "image",
+					"output":        "video",
+					"media_type":    "video",
+					"tags":          []string{"i2v"},
+					"tags_abbr":     "i2v",
+					"skill_content": "# alibaba_animate_anyone_detect",
+				},
+			},
+			"query":              "animate",
+			"limit":              2,
+			"estimatedTotalHits": 1,
+		})
+	})
+
+	resp, err := client.Modal.ListModels(context.Background(), sa.ModalModelSearchParams{
+		Query:    "animate",
+		Input:    "image",
+		Output:   "video",
+		Type:     "i2v",
+		Provider: "alibaba",
+		Limit:    2,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Query != "animate" {
+		t.Fatalf("unexpected query: %s", resp.Query)
+	}
+	if resp.Limit != 2 {
+		t.Fatalf("unexpected limit: %d", resp.Limit)
+	}
+	if resp.EstimatedTotalHits != 1 {
+		t.Fatalf("unexpected total hits: %d", resp.EstimatedTotalHits)
+	}
+	if len(resp.Hits) != 1 {
+		t.Fatalf("unexpected hit count: %d", len(resp.Hits))
+	}
+	if resp.Hits[0]["name"] != "alibaba_animate_anyone_detect" {
+		t.Fatalf("unexpected hit name: %v", resp.Hits[0]["name"])
+	}
+}
+
+func TestModalSearchModelsAlias(t *testing.T) {
+	_, client := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet || r.URL.Path != "/v1/models/skill/search" {
+			t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
+		}
+		if got := r.URL.Query().Get("q"); got != "" {
+			t.Fatalf("unexpected q: %s", got)
+		}
+		if got := r.URL.Query().Get("limit"); got != "2" {
+			t.Fatalf("unexpected limit: %s", got)
+		}
+
+		writeJSON(w, 200, map[string]any{
+			"hits":  []map[string]any{},
+			"query": "",
+			"limit": 2,
+		})
+	})
+
+	resp, err := client.Modal.SearchModels(context.Background(), sa.ModalModelSearchParams{Limit: 2})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Limit != 2 {
+		t.Fatalf("unexpected limit: %d", resp.Limit)
+	}
+}
+
+func TestModalGetModelSkill_ReturnsMarkdown(t *testing.T) {
+	_, client := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		if r.URL.Path != "/v1/models/skill/alibaba_animate_anyone_detect" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer test-key" {
+			t.Fatalf("unexpected authorization: %s", got)
+		}
+		if got := r.Header.Get("Accept"); got != "application/json" {
+			t.Fatalf("unexpected accept: %s", got)
+		}
+
+		w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("# alibaba_animate_anyone_detect\n\nparameters"))
+	})
+
+	content, err := client.Modal.GetModelSkill(context.Background(), "alibaba_animate_anyone_detect")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if content != "# alibaba_animate_anyone_detect\n\nparameters" {
+		t.Fatalf("unexpected content: %q", content)
+	}
+}
+
+func TestModalGetModelSkill_RequiresModel(t *testing.T) {
+	_, client := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("request should not be sent: %s %s", r.Method, r.URL.Path)
+	})
+
+	_, err := client.Modal.GetModelSkill(context.Background(), " ")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}
+
 func TestMediaWait_Completes(t *testing.T) {
 	var polls atomic.Int32
 

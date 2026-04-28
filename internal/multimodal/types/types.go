@@ -180,6 +180,35 @@ type ModelPricesData struct {
 	Models []ModelInfo `json:"models"`
 }
 
+// ModelSearchParams configures GET /v1/models/skill/search.
+type ModelSearchParams struct {
+	Query    string
+	Input    string
+	Output   string
+	Type     string
+	Provider string
+	Limit    int
+}
+
+// ModelSearchResponse is the Meilisearch-compatible response returned by
+// GET /v1/models/skill/search.
+type ModelSearchResponse struct {
+	Hits               []ModelSearchHit `json:"hits"`
+	Query              string           `json:"query,omitempty"`
+	ProcessingTimeMS   int              `json:"processingTimeMs,omitempty"`
+	Limit              int              `json:"limit,omitempty"`
+	Offset             int              `json:"offset,omitempty"`
+	EstimatedTotalHits int              `json:"estimatedTotalHits,omitempty"`
+	TotalHits          int              `json:"totalHits,omitempty"`
+	TotalPages         int              `json:"totalPages,omitempty"`
+	Page               int              `json:"page,omitempty"`
+	HitsPerPage        int              `json:"hitsPerPage,omitempty"`
+}
+
+// ModelSearchHit keeps model metadata flexible because search documents may
+// add provider-specific fields over time.
+type ModelSearchHit map[string]any
+
 func NewGenerateRequest(model string) *GenerateRequest {
 	return &GenerateRequest{
 		Model:      model,

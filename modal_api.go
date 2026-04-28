@@ -23,6 +23,36 @@ func (m *ModalService) Create(ctx context.Context, body JSONMap, opts ...Request
 	}, nil
 }
 
+// ListModels searches multimodal model skills via GET /v1/models/skill/search.
+//
+// Supported params:
+//   - Query maps to q
+//   - Input maps to input
+//   - Output maps to output
+//   - Type maps to type
+//   - Provider maps to provider
+//   - Limit maps to limit
+func (m *ModalService) ListModels(ctx context.Context, params ModalModelSearchParams, opts ...RequestOption) (*ModalModelSearchResponse, error) {
+	return mmservice.SearchModels(m.client, ctx, mmtypes.ModelSearchParams(params), buildRequestOptions(opts).headers)
+}
+
+// SearchModels searches multimodal model skills via GET /v1/models/skill/search.
+//
+// Supported params:
+//   - Query maps to q
+//   - Input maps to input
+//   - Output maps to output
+//   - Type maps to type
+//   - Provider maps to provider
+//   - Limit maps to limit
+func (m *ModalService) SearchModels(ctx context.Context, params ModalModelSearchParams, opts ...RequestOption) (*ModalModelSearchResponse, error) {
+	return m.ListModels(ctx, params, opts...)
+}
+
+func (m *ModalService) GetModelSkill(ctx context.Context, model string, opts ...RequestOption) (string, error) {
+	return mmservice.GetModelSkill(m.client, ctx, model, buildRequestOptions(opts).headers)
+}
+
 func getTask(client *transport.Client, ctx context.Context, taskID string, headers http.Header) (*Task, error) {
 	resp, err := mmservice.GetTask(client, ctx, taskID, headers)
 	if err != nil {

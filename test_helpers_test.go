@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	sa "github.com/seaart/sa-go"
+	sa "github.com/SeaVerseAI/sa-go"
 )
 
 func newTestServer(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *sa.Client) {

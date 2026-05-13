@@ -1,6 +1,6 @@
 package alibaba
 
-import mmtypes "github.com/seaart/sa-go/internal/multimodal/types"
+import mmtypes "github.com/SeaVerseAI/sa-go/internal/multimodal/types"
 
 type Factory struct{}
 

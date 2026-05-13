@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"strings"
 
-	llmtypes "github.com/seaart/sa-go/internal/llm/types"
-	"github.com/seaart/sa-go/internal/shared"
-	"github.com/seaart/sa-go/internal/transport"
+	llmtypes "github.com/SeaVerseAI/sa-go/internal/llm/types"
+	"github.com/SeaVerseAI/sa-go/internal/shared"
+	"github.com/SeaVerseAI/sa-go/internal/transport"
 )
 
 func ChatCompletionsStream(client *transport.Client, ctx context.Context, payload llmtypes.JSONMap, headers http.Header) (<-chan llmtypes.StreamEvent, error) {

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	sa "github.com/seaart/sa-go"
+	sa "github.com/SeaVerseAI/sa-go"
 )
 
 func liveLLMClient(t *testing.T) *sa.Client {

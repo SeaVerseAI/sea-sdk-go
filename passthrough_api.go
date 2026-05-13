@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/seaart/sa-go/internal/shared"
+	"github.com/SeaVerseAI/sa-go/internal/shared"
 )
 
 // Request sends one vendor-compatible passthrough request with a JSON-encoded body.

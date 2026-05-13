@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	llmtypes "github.com/seaart/sa-go/internal/llm/types"
-	"github.com/seaart/sa-go/internal/shared"
-	"github.com/seaart/sa-go/internal/transport"
+	llmtypes "github.com/SeaVerseAI/sa-go/internal/llm/types"
+	"github.com/SeaVerseAI/sa-go/internal/shared"
+	"github.com/SeaVerseAI/sa-go/internal/transport"
 )
 
 const (

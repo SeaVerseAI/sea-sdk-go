@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	mmtypes "github.com/seaart/sa-go/internal/multimodal/types"
-	"github.com/seaart/sa-go/internal/shared"
-	"github.com/seaart/sa-go/internal/transport"
+	mmtypes "github.com/SeaVerseAI/sa-go/internal/multimodal/types"
+	"github.com/SeaVerseAI/sa-go/internal/shared"
+	"github.com/SeaVerseAI/sa-go/internal/transport"
 )
 
 const (

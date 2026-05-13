@@ -9,7 +9,7 @@ SeaArt Go SDK（`sa-go`）是 SeaArt AI 平台的官方 Go 客户端库，提供
 ## 安装
 
 ```bash
-go get github.com/seaart/sa-go
+go get github.com/SeaVerseAI/sa-go
 ```
 
 ---
@@ -17,7 +17,7 @@ go get github.com/seaart/sa-go
 ## 快速开始
 
 ```go
-import sa "github.com/seaart/sa-go"
+import sa "github.com/SeaVerseAI/sa-go"
 
 client, err := sa.New(&sa.ClientConfig{
     APIKey: "sa-your-api-key",
@@ -387,7 +387,7 @@ import (
     "fmt"
     "log"
 
-    sa "github.com/seaart/sa-go"
+    sa "github.com/SeaVerseAI/sa-go"
 )
 
 func main() {
@@ -445,7 +445,7 @@ import (
     "fmt"
     "log"
 
-    sa "github.com/seaart/sa-go"
+    sa "github.com/SeaVerseAI/sa-go"
 )
 
 func main() {

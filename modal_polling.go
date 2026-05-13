@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	mmservice "github.com/SeaVerseAI/sa-go/internal/multimodal/service"
-	mmtypes "github.com/SeaVerseAI/sa-go/internal/multimodal/types"
-	"github.com/SeaVerseAI/sa-go/internal/transport"
+	mmservice "github.com/SeaVerseAI/sea-sdk-go/internal/multimodal/service"
+	mmtypes "github.com/SeaVerseAI/sea-sdk-go/internal/multimodal/types"
+	"github.com/SeaVerseAI/sea-sdk-go/internal/transport"
 )
 
 type PollOption = mmtypes.PollOption

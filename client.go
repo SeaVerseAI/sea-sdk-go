@@ -6,7 +6,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/SeaVerseAI/sa-go/internal/transport"
+	"github.com/SeaVerseAI/sea-sdk-go/internal/transport"
 )
 
 const (

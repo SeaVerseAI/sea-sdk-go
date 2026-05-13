@@ -1,6 +1,6 @@
 package sa
 
-import "github.com/SeaVerseAI/sa-go/internal/transport"
+import "github.com/SeaVerseAI/sea-sdk-go/internal/transport"
 
 // ModalService provides the first-phase modal task APIs.
 type ModalService struct {

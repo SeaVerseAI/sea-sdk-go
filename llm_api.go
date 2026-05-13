@@ -3,7 +3,7 @@ package sa
 import (
 	"context"
 
-	llmservice "github.com/SeaVerseAI/sa-go/internal/llm/service"
+	llmservice "github.com/SeaVerseAI/sea-sdk-go/internal/llm/service"
 )
 
 func (l *LLMService) ChatCompletions(ctx context.Context, payload JSONMap, opts ...RequestOption) (RawResponse, error) {

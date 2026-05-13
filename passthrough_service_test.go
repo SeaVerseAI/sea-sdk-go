@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	sa "github.com/SeaVerseAI/sa-go"
+	sa "github.com/SeaVerseAI/sea-sdk-go"
 )
 
 func newPassthroughTestClient(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *sa.Client) {

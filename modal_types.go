@@ -49,9 +49,21 @@ type Output = mmtypes.OutputItem
 type OutputContent = mmtypes.OutputContent
 type Usage = mmtypes.Usage
 type APIError = mmtypes.APIError
+type ImageScanRiskType = mmtypes.ImageScanRiskType
+type ImageScanRequest = mmtypes.ImageScanRequest
+type ImageScanResponse = mmtypes.ImageScanResponse
+type ImageScanLabel = mmtypes.ImageScanLabel
+type ImageScanFrameResult = mmtypes.ImageScanFrameResult
 type ModalModelSearchParams = mmtypes.ModelSearchParams
 type ModalModelSearchResponse = mmtypes.ModelSearchResponse
 type ModalModelSearchHit = mmtypes.ModelSearchHit
+
+const (
+	ImageScanRiskTypePolity  = mmtypes.ImageScanRiskTypePolity
+	ImageScanRiskTypeErotic  = mmtypes.ImageScanRiskTypeErotic
+	ImageScanRiskTypeViolent = mmtypes.ImageScanRiskTypeViolent
+	ImageScanRiskTypeChild   = mmtypes.ImageScanRiskTypeChild
+)
 
 func (r TaskCreateRequest) Raw() JSONMap {
 	body := JSONMap{

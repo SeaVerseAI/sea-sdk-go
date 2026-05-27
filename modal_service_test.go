@@ -259,6 +259,85 @@ func TestModalGetModelSkill_RequiresModel(t *testing.T) {
 	}
 }
 
+func TestModalScanImage_PostsImageScanRequest(t *testing.T) {
+	_, client := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		if r.URL.Path != "/v1/image/scan" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer test-key" {
+			t.Fatalf("unexpected authorization: %s", got)
+		}
+		if got := r.Header.Get("X-Trace-Id"); got != "trace-scan" {
+			t.Fatalf("unexpected trace header: %s", got)
+		}
+
+		body := extractBody(t, r)
+		if body["uri"] != "https://example.com/image.jpg" {
+			t.Fatalf("unexpected uri: %v", body["uri"])
+		}
+		if body["detected_age"] != float64(1) {
+			t.Fatalf("unexpected detected_age: %v", body["detected_age"])
+		}
+		if body["is_video"] != float64(0) {
+			t.Fatalf("unexpected is_video: %v", body["is_video"])
+		}
+		risks := body["risk_types"].([]any)
+		if len(risks) != 2 || risks[0] != "EROTIC" || risks[1] != "VIOLENT" {
+			t.Fatalf("unexpected risk_types: %v", risks)
+		}
+
+		writeJSON(w, 200, map[string]any{
+			"ok":         true,
+			"nsfw_level": 2,
+			"label_items": []map[string]any{
+				{"name": "safe", "score": 2, "risk_type": "EROTIC"},
+			},
+			"risk_types": []string{"EROTIC"},
+			"usage": map[string]any{
+				"cost": "0.001",
+			},
+		})
+	})
+
+	resp, err := client.Modal.ScanImage(context.Background(), sa.ImageScanRequest{
+		URI: "https://example.com/image.jpg",
+		RiskTypes: []sa.ImageScanRiskType{
+			sa.ImageScanRiskTypeErotic,
+			sa.ImageScanRiskTypeViolent,
+		},
+		DetectedAge: 1,
+	}, sa.WithHeader("X-Trace-Id", "trace-scan"))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !resp.OK {
+		t.Fatal("expected ok response")
+	}
+	if resp.NSFWLevel != 2 {
+		t.Fatalf("unexpected nsfw level: %d", resp.NSFWLevel)
+	}
+	if len(resp.LabelItems) != 1 || resp.LabelItems[0].RiskType != sa.ImageScanRiskTypeErotic {
+		t.Fatalf("unexpected labels: %+v", resp.LabelItems)
+	}
+	if resp.Usage == nil || resp.Usage.Cost.String() != "0.001" {
+		t.Fatalf("unexpected usage: %+v", resp.Usage)
+	}
+}
+
+func TestModalScanImage_RequiresURI(t *testing.T) {
+	_, client := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("request should not be sent: %s %s", r.Method, r.URL.Path)
+	})
+
+	_, err := client.Modal.ScanImage(context.Background(), sa.ImageScanRequest{URI: " "})
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}
+
 func TestMediaWait_Completes(t *testing.T) {
 	var polls atomic.Int32
 

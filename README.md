@@ -68,6 +68,7 @@ if err != nil {
 - `client.Modal.ListModels(...)`
 - `client.Modal.SearchModels(...)`
 - `client.Modal.GetModelSkill(...)`
+- `client.Modal.ScanImage(...)`
 - `task.Wait(...)`
 
 ### 原始透传请求
@@ -187,6 +188,41 @@ if err != nil {
 }
 fmt.Println(skill)
 ```
+
+### 图片/视频鉴黄
+
+鉴黄接口复用 `ModelBaseURL`，对应 `POST /v1/image/scan`。请求会通过 openresty 转发到 inference-gateway。
+
+```go
+resp, err := client.Modal.ScanImage(ctx, sa.ImageScanRequest{
+    URI: "https://example.com/image.jpg",
+    RiskTypes: []sa.ImageScanRiskType{
+        sa.ImageScanRiskTypePolity,
+        sa.ImageScanRiskTypeErotic,
+        sa.ImageScanRiskTypeViolent,
+        sa.ImageScanRiskTypeChild,
+    },
+    DetectedAge: 0,
+    IsVideo:     0,
+})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(resp.OK, resp.NSFWLevel, resp.RiskTypes)
+```
+
+视频检测时设置 `IsVideo: 1`，并可传 `Duration` 用于计费：
+
+```go
+resp, err := client.Modal.ScanImage(ctx, sa.ImageScanRequest{
+    URI:       "https://example.com/video.mp4",
+    RiskTypes: []sa.ImageScanRiskType{sa.ImageScanRiskTypeErotic, sa.ImageScanRiskTypeViolent},
+    IsVideo:   1,
+    Duration:  12.5,
+})
+```
+
+常用响应字段包括 `OK`、`NSFWLevel`、`LabelItems`、`RiskTypes`、`FrameResults` 和 `Usage`。
 
 ## Passthrough API
 

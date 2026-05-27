@@ -53,6 +53,10 @@ func (m *ModalService) GetModelSkill(ctx context.Context, model string, opts ...
 	return mmservice.GetModelSkill(m.client, ctx, model, buildRequestOptions(opts).headers)
 }
 
+func (m *ModalService) ScanImage(ctx context.Context, req ImageScanRequest, opts ...RequestOption) (*ImageScanResponse, error) {
+	return mmservice.ScanImage(m.client, ctx, mmtypes.ImageScanRequest(req), buildRequestOptions(opts).headers)
+}
+
 func getTask(client *transport.Client, ctx context.Context, taskID string, headers http.Header) (*Task, error) {
 	resp, err := mmservice.GetTask(client, ctx, taskID, headers)
 	if err != nil {

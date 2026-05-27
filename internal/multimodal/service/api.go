@@ -18,6 +18,7 @@ const (
 	PathTask             = "/v1/generation/task/"
 	PathModelSkillSearch = "/v1/models/skill/search"
 	PathModelSkill       = "/v1/models/skill/"
+	PathImageScan        = "/v1/image/scan"
 )
 
 func CreateTask(client *transport.Client, ctx context.Context, body any, headers http.Header) (*mmtypes.GenerationResponse, error) {
@@ -86,6 +87,27 @@ func GetModelSkill(client *transport.Client, ctx context.Context, model string, 
 	}
 
 	return string(payload), nil
+}
+
+func ScanImage(client *transport.Client, ctx context.Context, req mmtypes.ImageScanRequest, headers http.Header) (*mmtypes.ImageScanResponse, error) {
+	req.URI = strings.TrimSpace(req.URI)
+	if req.URI == "" {
+		return nil, &shared.Error{Kind: shared.ErrGeneral, Message: "uri is required"}
+	}
+
+	status, payload, err := client.Request(ctx, http.MethodPost, PathImageScan, req, headers)
+	if err != nil {
+		return nil, err
+	}
+	if status >= 400 {
+		return nil, httpError(status, payload)
+	}
+
+	var resp mmtypes.ImageScanResponse
+	if err := decode(payload, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
 func modelSearchQuery(params mmtypes.ModelSearchParams) string {

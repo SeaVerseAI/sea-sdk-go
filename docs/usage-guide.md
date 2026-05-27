@@ -139,6 +139,43 @@ if task.Status == "completed" {
 }
 ```
 
+### 图片/视频鉴黄
+
+鉴黄接口走 `ModelBaseURL`，对应 `POST /v1/image/scan`，用于图片、GIF 或视频风险检测。
+
+```go
+resp, err := client.Modal.ScanImage(ctx, sa.ImageScanRequest{
+    URI: "https://example.com/image.jpg",
+    RiskTypes: []sa.ImageScanRiskType{
+        sa.ImageScanRiskTypePolity,
+        sa.ImageScanRiskTypeErotic,
+        sa.ImageScanRiskTypeViolent,
+        sa.ImageScanRiskTypeChild,
+    },
+    DetectedAge: 0,
+    IsVideo:     0,
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+fmt.Println(resp.OK, resp.NSFWLevel, resp.RiskTypes)
+for _, label := range resp.LabelItems {
+    fmt.Println(label.Name, label.Score, label.RiskType)
+}
+```
+
+视频检测设置 `IsVideo: 1`，可传 `Duration`：
+
+```go
+resp, err := client.Modal.ScanImage(ctx, sa.ImageScanRequest{
+    URI:       "https://example.com/video.mp4",
+    RiskTypes: []sa.ImageScanRiskType{sa.ImageScanRiskTypeErotic, sa.ImageScanRiskTypeViolent},
+    IsVideo:   1,
+    Duration:  12.5,
+})
+```
+
 **Task 结构体：**
 
 ```go

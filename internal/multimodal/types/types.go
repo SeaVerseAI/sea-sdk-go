@@ -103,6 +103,52 @@ func (e *APIError) Error() string {
 	return "unknown API error"
 }
 
+type ImageScanRiskType string
+
+const (
+	ImageScanRiskTypePolity  ImageScanRiskType = "POLITY"
+	ImageScanRiskTypeErotic  ImageScanRiskType = "EROTIC"
+	ImageScanRiskTypeViolent ImageScanRiskType = "VIOLENT"
+	ImageScanRiskTypeChild   ImageScanRiskType = "CHILD"
+)
+
+type ImageScanRequest struct {
+	URI         string              `json:"uri"`
+	RiskTypes   []ImageScanRiskType `json:"risk_types"`
+	DetectedAge int                 `json:"detected_age"`
+	IsVideo     int                 `json:"is_video"`
+	Duration    float64             `json:"duration,omitempty"`
+}
+
+type ImageScanResponse struct {
+	OK            bool                   `json:"ok"`
+	NSFWLevel     int                    `json:"nsfw_level,omitempty"`
+	LabelItems    []ImageScanLabel       `json:"label_items,omitempty"`
+	RiskTypes     []ImageScanRiskType    `json:"risk_types,omitempty"`
+	AgeGroup      []any                  `json:"age_group,omitempty"`
+	Error         string                 `json:"error,omitempty"`
+	VideoDuration float64                `json:"video_duration,omitempty"`
+	MaxRiskFrame  int                    `json:"max_risk_frame,omitempty"`
+	FrameCount    int                    `json:"frame_count,omitempty"`
+	FramesChecked int                    `json:"frames_checked,omitempty"`
+	EarlyExit     bool                   `json:"early_exit,omitempty"`
+	FrameResults  []ImageScanFrameResult `json:"frame_results,omitempty"`
+	Usage         *Usage                 `json:"usage,omitempty"`
+}
+
+type ImageScanLabel struct {
+	Name     string            `json:"name"`
+	Score    int               `json:"score"`
+	RiskType ImageScanRiskType `json:"risk_type"`
+}
+
+type ImageScanFrameResult struct {
+	FrameIndex int                 `json:"frame_index"`
+	NSFWLevel  int                 `json:"nsfw_level"`
+	LabelItems []ImageScanLabel    `json:"label_items,omitempty"`
+	RiskTypes  []ImageScanRiskType `json:"risk_types,omitempty"`
+}
+
 func (t *TaskResponse) URLs() []string {
 	var urls []string
 	for _, out := range t.Output {

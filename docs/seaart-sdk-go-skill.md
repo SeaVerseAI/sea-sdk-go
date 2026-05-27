@@ -131,6 +131,29 @@ for _, output := range task.Output {
 
 **Task 状态：** `"in_progress"` / `"completed"` / `"failed"`
 
+### 图片/视频鉴黄
+
+使用 `client.Modal.ScanImage` 调用 `ModelBaseURL + /v1/image/scan`。
+
+```go
+resp, err := client.Modal.ScanImage(ctx, sa.ImageScanRequest{
+    URI: "https://example.com/image.jpg",
+    RiskTypes: []sa.ImageScanRiskType{
+        sa.ImageScanRiskTypePolity,
+        sa.ImageScanRiskTypeErotic,
+        sa.ImageScanRiskTypeViolent,
+        sa.ImageScanRiskTypeChild,
+    },
+    IsVideo: 0,
+})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(resp.OK, resp.NSFWLevel, resp.RiskTypes)
+```
+
+视频检测设置 `IsVideo: 1`，可传 `Duration`；响应中的 `FrameResults` 包含帧级检测结果。
+
 ---
 
 ## Passthrough API（厂商透传）

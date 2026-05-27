@@ -53,6 +53,7 @@ func (m *ModalService) GetModelSkill(ctx context.Context, model string, opts ...
 	return mmservice.GetModelSkill(m.client, ctx, model, buildRequestOptions(opts).headers)
 }
 
+// ScanImage scans an image, GIF, or video through ModelBaseURL + /v1/image/scan.
 func (m *ModalService) ScanImage(ctx context.Context, req ImageScanRequest, opts ...RequestOption) (*ImageScanResponse, error) {
 	return mmservice.ScanImage(m.client, ctx, mmtypes.ImageScanRequest(req), buildRequestOptions(opts).headers)
 }

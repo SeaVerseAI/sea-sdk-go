@@ -49,10 +49,20 @@ type Output = mmtypes.OutputItem
 type OutputContent = mmtypes.OutputContent
 type Usage = mmtypes.Usage
 type APIError = mmtypes.APIError
+
+// ImageScanRiskType selects which safety categories POST /v1/image/scan should detect.
 type ImageScanRiskType = mmtypes.ImageScanRiskType
+
+// ImageScanRequest is the request body for POST /v1/image/scan.
 type ImageScanRequest = mmtypes.ImageScanRequest
+
+// ImageScanResponse is the parsed response returned by POST /v1/image/scan.
 type ImageScanResponse = mmtypes.ImageScanResponse
+
+// ImageScanLabel describes one safety label detected by the scan service.
 type ImageScanLabel = mmtypes.ImageScanLabel
+
+// ImageScanFrameResult describes one sampled frame in a video scan.
 type ImageScanFrameResult = mmtypes.ImageScanFrameResult
 type ModalModelSearchParams = mmtypes.ModelSearchParams
 type ModalModelSearchResponse = mmtypes.ModelSearchResponse

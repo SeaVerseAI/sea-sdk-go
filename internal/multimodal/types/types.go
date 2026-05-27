@@ -103,6 +103,7 @@ func (e *APIError) Error() string {
 	return "unknown API error"
 }
 
+// ImageScanRiskType selects which safety categories the scan service should detect.
 type ImageScanRiskType string
 
 const (
@@ -116,41 +117,70 @@ const (
 	ImageScanRiskTypeChild ImageScanRiskType = "CHILD"
 )
 
+// ImageScanRequest is the request body for POST /v1/image/scan.
 type ImageScanRequest struct {
-	URI         string              `json:"uri"`
-	RiskTypes   []ImageScanRiskType `json:"risk_types"`
-	DetectedAge int                 `json:"detected_age"`
-	IsVideo     int                 `json:"is_video"`
-	Duration    float64             `json:"duration,omitempty"`
+	// URI is the image, GIF, or video URL to scan.
+	URI string `json:"uri"`
+	// RiskTypes limits detection to the requested safety categories.
+	RiskTypes []ImageScanRiskType `json:"risk_types"`
+	// DetectedAge enables age-group detection when set to 1; set to 0 to disable it.
+	DetectedAge int `json:"detected_age"`
+	// IsVideo marks the URI as video content when set to 1; images and GIFs use 0.
+	IsVideo int `json:"is_video"`
+	// Duration is the video duration in seconds and is used for video billing when known.
+	Duration float64 `json:"duration,omitempty"`
 }
 
+// ImageScanResponse is the parsed response returned by POST /v1/image/scan.
 type ImageScanResponse struct {
-	OK            bool                   `json:"ok"`
-	NSFWLevel     int                    `json:"nsfw_level,omitempty"`
-	LabelItems    []ImageScanLabel       `json:"label_items,omitempty"`
-	RiskTypes     []ImageScanRiskType    `json:"risk_types,omitempty"`
-	AgeGroup      []any                  `json:"age_group,omitempty"`
-	Error         string                 `json:"error,omitempty"`
-	VideoDuration float64                `json:"video_duration,omitempty"`
-	MaxRiskFrame  int                    `json:"max_risk_frame,omitempty"`
-	FrameCount    int                    `json:"frame_count,omitempty"`
-	FramesChecked int                    `json:"frames_checked,omitempty"`
-	EarlyExit     bool                   `json:"early_exit,omitempty"`
-	FrameResults  []ImageScanFrameResult `json:"frame_results,omitempty"`
-	Usage         *Usage                 `json:"usage,omitempty"`
+	// OK reports whether the scan service completed the business request successfully.
+	OK bool `json:"ok"`
+	// NSFWLevel is the highest risk level, usually 0-6. Higher values indicate higher risk.
+	NSFWLevel int `json:"nsfw_level,omitempty"`
+	// LabelItems contains detailed labels detected on image content or the highest-risk frame.
+	LabelItems []ImageScanLabel `json:"label_items,omitempty"`
+	// RiskTypes lists the risk categories actually detected in the media.
+	RiskTypes []ImageScanRiskType `json:"risk_types,omitempty"`
+	// AgeGroup contains provider-specific age-group output, typically age bucket and confidence.
+	AgeGroup []any `json:"age_group,omitempty"`
+	// Error contains the scan service business error when OK is false.
+	Error string `json:"error,omitempty"`
+	// VideoDuration is the duration detected or used by the upstream video scanner, in seconds.
+	VideoDuration float64 `json:"video_duration,omitempty"`
+	// MaxRiskFrame is the frame index with the highest risk in a video scan.
+	MaxRiskFrame int `json:"max_risk_frame,omitempty"`
+	// FrameCount is the total number of frames sampled or considered by the scanner.
+	FrameCount int `json:"frame_count,omitempty"`
+	// FramesChecked is the actual number of frames scanned before completion or early exit.
+	FramesChecked int `json:"frames_checked,omitempty"`
+	// EarlyExit indicates the scanner stopped early after finding a high-risk frame.
+	EarlyExit bool `json:"early_exit,omitempty"`
+	// FrameResults contains per-frame results for video scans.
+	FrameResults []ImageScanFrameResult `json:"frame_results,omitempty"`
+	// Usage contains gateway billing metadata injected by inference-gateway.
+	Usage *Usage `json:"usage,omitempty"`
 }
 
+// ImageScanLabel describes one safety label detected by the scan service.
 type ImageScanLabel struct {
-	Name     string            `json:"name"`
-	Score    int               `json:"score"`
+	// Name is the provider label name, for example a scene/category/tag path.
+	Name string `json:"name"`
+	// Score is the label risk score or level, usually aligned to the 0-6 risk scale.
+	Score int `json:"score"`
+	// RiskType is the safety category this label belongs to.
 	RiskType ImageScanRiskType `json:"risk_type"`
 }
 
+// ImageScanFrameResult describes one sampled frame in a video scan.
 type ImageScanFrameResult struct {
-	FrameIndex int                 `json:"frame_index"`
-	NSFWLevel  int                 `json:"nsfw_level"`
-	LabelItems []ImageScanLabel    `json:"label_items,omitempty"`
-	RiskTypes  []ImageScanRiskType `json:"risk_types,omitempty"`
+	// FrameIndex is the sampled frame index in the video.
+	FrameIndex int `json:"frame_index"`
+	// NSFWLevel is the highest risk level detected on this frame.
+	NSFWLevel int `json:"nsfw_level"`
+	// LabelItems contains detailed labels detected on this frame.
+	LabelItems []ImageScanLabel `json:"label_items,omitempty"`
+	// RiskTypes lists the risk categories detected on this frame.
+	RiskTypes []ImageScanRiskType `json:"risk_types,omitempty"`
 }
 
 func (t *TaskResponse) URLs() []string {

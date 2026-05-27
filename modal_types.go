@@ -59,10 +59,14 @@ type ModalModelSearchResponse = mmtypes.ModelSearchResponse
 type ModalModelSearchHit = mmtypes.ModelSearchHit
 
 const (
-	ImageScanRiskTypePolity  = mmtypes.ImageScanRiskTypePolity
-	ImageScanRiskTypeErotic  = mmtypes.ImageScanRiskTypeErotic
+	// ImageScanRiskTypePolity detects political or public-safety sensitive content.
+	ImageScanRiskTypePolity = mmtypes.ImageScanRiskTypePolity
+	// ImageScanRiskTypeErotic detects erotic, pornographic, nudity, or sexually suggestive content.
+	ImageScanRiskTypeErotic = mmtypes.ImageScanRiskTypeErotic
+	// ImageScanRiskTypeViolent detects violent, bloody, weapon, or gore-related content.
 	ImageScanRiskTypeViolent = mmtypes.ImageScanRiskTypeViolent
-	ImageScanRiskTypeChild   = mmtypes.ImageScanRiskTypeChild
+	// ImageScanRiskTypeChild detects child-safety risks, especially sexualized or unsafe child-related content.
+	ImageScanRiskTypeChild = mmtypes.ImageScanRiskTypeChild
 )
 
 func (r TaskCreateRequest) Raw() JSONMap {

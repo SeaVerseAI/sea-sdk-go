@@ -224,6 +224,15 @@ resp, err := client.Modal.ScanImage(ctx, sa.ImageScanRequest{
 
 常用响应字段包括 `OK`、`NSFWLevel`、`LabelItems`、`RiskTypes`、`FrameResults` 和 `Usage`。
 
+风险类型说明：
+
+| 常量 | 接口值 | 说明 |
+|------|--------|------|
+| `sa.ImageScanRiskTypePolity` | `POLITY` | 政治敏感、公共安全等风险内容 |
+| `sa.ImageScanRiskTypeErotic` | `EROTIC` | 色情、裸露、性暗示等成人内容 |
+| `sa.ImageScanRiskTypeViolent` | `VIOLENT` | 暴力、血腥、武器、伤害等内容 |
+| `sa.ImageScanRiskTypeChild` | `CHILD` | 儿童安全风险，尤其是儿童相关不安全或性化内容 |
+
 ## Passthrough API
 
 Passthrough 层保留厂商原始 API 形态。路径需要带厂商前缀，例如 `/kling/...`、`/vidu/...`、`/google/...`。

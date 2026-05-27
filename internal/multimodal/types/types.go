@@ -106,10 +106,14 @@ func (e *APIError) Error() string {
 type ImageScanRiskType string
 
 const (
-	ImageScanRiskTypePolity  ImageScanRiskType = "POLITY"
-	ImageScanRiskTypeErotic  ImageScanRiskType = "EROTIC"
+	// ImageScanRiskTypePolity detects political or public-safety sensitive content.
+	ImageScanRiskTypePolity ImageScanRiskType = "POLITY"
+	// ImageScanRiskTypeErotic detects erotic, pornographic, nudity, or sexually suggestive content.
+	ImageScanRiskTypeErotic ImageScanRiskType = "EROTIC"
+	// ImageScanRiskTypeViolent detects violent, bloody, weapon, or gore-related content.
 	ImageScanRiskTypeViolent ImageScanRiskType = "VIOLENT"
-	ImageScanRiskTypeChild   ImageScanRiskType = "CHILD"
+	// ImageScanRiskTypeChild detects child-safety risks, especially sexualized or unsafe child-related content.
+	ImageScanRiskTypeChild ImageScanRiskType = "CHILD"
 )
 
 type ImageScanRequest struct {

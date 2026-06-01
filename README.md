@@ -234,6 +234,27 @@ resp, err := client.Modal.ScanImage(ctx, sa.ImageScanRequest{
 | `sa.ImageScanRiskTypeViolent` | `VIOLENT` | 暴力、血腥、武器、伤害等内容 |
 | `sa.ImageScanRiskTypeChild` | `CHILD` | 儿童安全风险，尤其是儿童相关不安全或性化内容 |
 
+### 敏感词检测
+
+敏感词检测接口复用 `ModelBaseURL`，对应 `POST /v1/text/scan`。
+
+```go
+resp, err := client.Modal.ScanText(ctx, sa.TextScanRequest{
+    Text:      "prompt to check",
+    Scene:     1,
+    AreaTypes: []int{1, 2},
+    Way:       2,
+    Scenes:    []string{"prompt"},
+})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(resp.Usage)
+fmt.Println(resp.Extra["result"])
+```
+
+上游敏感词检测返回结构会保留在 `resp.Extra`，网关注入的计费信息在 `resp.Usage`。
+
 ### 人脸检测
 
 人脸检测接口复用 `ModelBaseURL`，对应 `POST /v1/face/scan`，由 openresty 转发到 inference-gateway，再转发到上游 `/cloud/face/scan`。

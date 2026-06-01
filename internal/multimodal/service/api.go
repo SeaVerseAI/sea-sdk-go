@@ -22,6 +22,8 @@ const (
 	PathImageScan = "/v1/image/scan"
 	// PathFaceScan is the face-detection scan endpoint used for images and videos.
 	PathFaceScan = "/v1/face/scan"
+	// PathTextScan is the sensitive-word scan endpoint used for text prompts.
+	PathTextScan = "/v1/text/scan"
 )
 
 func CreateTask(client *transport.Client, ctx context.Context, body any, headers http.Header) (*mmtypes.GenerationResponse, error) {
@@ -108,6 +110,27 @@ func ScanImage(client *transport.Client, ctx context.Context, req mmtypes.ImageS
 	}
 
 	var resp mmtypes.ImageScanResponse
+	if err := decode(payload, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// ScanText sends a sensitive-word scan request to PathTextScan.
+func ScanText(client *transport.Client, ctx context.Context, req mmtypes.TextScanRequest, headers http.Header) (*mmtypes.TextScanResponse, error) {
+	if strings.TrimSpace(req.Text) == "" {
+		return nil, &shared.Error{Kind: shared.ErrGeneral, Message: "text is required"}
+	}
+
+	status, payload, err := client.Request(ctx, http.MethodPost, PathTextScan, req, headers)
+	if err != nil {
+		return nil, err
+	}
+	if status >= 400 {
+		return nil, httpError(status, payload)
+	}
+
+	var resp mmtypes.TextScanResponse
 	if err := decode(payload, &resp); err != nil {
 		return nil, err
 	}

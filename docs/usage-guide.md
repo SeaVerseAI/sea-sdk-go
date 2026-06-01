@@ -185,6 +185,28 @@ resp, err := client.Modal.ScanImage(ctx, sa.ImageScanRequest{
 | `sa.ImageScanRiskTypeViolent` | `VIOLENT` | 暴力、血腥、武器、伤害等内容 |
 | `sa.ImageScanRiskTypeChild` | `CHILD` | 儿童安全风险，尤其是儿童相关不安全或性化内容 |
 
+### 敏感词检测
+
+敏感词检测接口走 `ModelBaseURL`，对应 `POST /v1/text/scan`。
+
+```go
+resp, err := client.Modal.ScanText(ctx, sa.TextScanRequest{
+    Text:      "prompt to check",
+    Scene:     1,
+    AreaTypes: []int{1, 2},
+    Way:       2,
+    Scenes:    []string{"prompt"},
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+fmt.Println(resp.Usage)
+fmt.Println(resp.Extra["result"])
+```
+
+上游返回中的未建模字段会保留在 `Extra`，网关注入的计费信息在 `Usage`。
+
 ### 人脸检测
 
 人脸检测接口走 `ModelBaseURL`，对应 `POST /v1/face/scan`，用于图片或视频人脸检测。网关会转发到上游 `/cloud/face/scan`。

@@ -58,6 +58,11 @@ func (m *ModalService) ScanImage(ctx context.Context, req ImageScanRequest, opts
 	return mmservice.ScanImage(m.client, ctx, mmtypes.ImageScanRequest(req), buildRequestOptions(opts).headers)
 }
 
+// ScanText scans prompt text through ModelBaseURL + /v1/text/scan.
+func (m *ModalService) ScanText(ctx context.Context, req TextScanRequest, opts ...RequestOption) (*TextScanResponse, error) {
+	return mmservice.ScanText(m.client, ctx, mmtypes.TextScanRequest(req), buildRequestOptions(opts).headers)
+}
+
 // ScanFace scans an image or video through ModelBaseURL + /v1/face/scan.
 func (m *ModalService) ScanFace(ctx context.Context, req FaceScanRequest, opts ...RequestOption) (*FaceScanResponse, error) {
 	return mmservice.ScanFace(m.client, ctx, mmtypes.FaceScanRequest(req), buildRequestOptions(opts).headers)

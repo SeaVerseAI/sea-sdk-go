@@ -338,6 +338,85 @@ func TestModalScanImage_RequiresURI(t *testing.T) {
 	}
 }
 
+func TestModalScanText_PostsTextScanRequest(t *testing.T) {
+	_, client := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		if r.URL.Path != "/v1/text/scan" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		if got := r.Header.Get("Authorization"); got != "Bearer test-key" {
+			t.Fatalf("unexpected authorization: %s", got)
+		}
+		if got := r.Header.Get("X-Trace-Id"); got != "trace-text" {
+			t.Fatalf("unexpected trace header: %s", got)
+		}
+
+		body := extractBody(t, r)
+		if body["text"] != "a prompt to check" {
+			t.Fatalf("unexpected text: %v", body["text"])
+		}
+		if body["scene"] != float64(1) {
+			t.Fatalf("unexpected scene: %v", body["scene"])
+		}
+		areaTypes := body["area_types"].([]any)
+		if len(areaTypes) != 2 || areaTypes[0] != float64(1) || areaTypes[1] != float64(2) {
+			t.Fatalf("unexpected area_types: %v", areaTypes)
+		}
+		if body["way"] != float64(2) {
+			t.Fatalf("unexpected way: %v", body["way"])
+		}
+		scenes := body["scenes"].([]any)
+		if len(scenes) != 1 || scenes[0] != "prompt" {
+			t.Fatalf("unexpected scenes: %v", scenes)
+		}
+
+		writeJSON(w, 200, map[string]any{
+			"code":    0,
+			"message": "ok",
+			"result": map[string]any{
+				"pass": true,
+			},
+			"usage": map[string]any{
+				"cost": "0.003",
+			},
+		})
+	})
+
+	resp, err := client.Modal.ScanText(context.Background(), sa.TextScanRequest{
+		Text:      "a prompt to check",
+		Scene:     1,
+		AreaTypes: []int{1, 2},
+		Way:       2,
+		Scenes:    []string{"prompt"},
+	}, sa.WithHeader("X-Trace-Id", "trace-text"))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Usage == nil || resp.Usage.Cost.String() != "0.003" {
+		t.Fatalf("unexpected usage: %+v", resp.Usage)
+	}
+	if resp.Extra["code"] != float64(0) {
+		t.Fatalf("unexpected extra fields: %+v", resp.Extra)
+	}
+	result := resp.Extra["result"].(map[string]any)
+	if result["pass"] != true {
+		t.Fatalf("unexpected result: %+v", result)
+	}
+}
+
+func TestModalScanText_RequiresText(t *testing.T) {
+	_, client := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("request should not be sent: %s %s", r.Method, r.URL.Path)
+	})
+
+	_, err := client.Modal.ScanText(context.Background(), sa.TextScanRequest{Text: " "})
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}
+
 func TestModalScanFace_PostsFaceScanRequest(t *testing.T) {
 	_, client := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

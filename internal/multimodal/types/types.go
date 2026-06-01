@@ -183,6 +183,49 @@ type ImageScanFrameResult struct {
 	RiskTypes []ImageScanRiskType `json:"risk_types,omitempty"`
 }
 
+// TextScanRequest is the request body for POST /v1/text/scan.
+type TextScanRequest struct {
+	// Text is the prompt or text content to scan for sensitive words.
+	Text string `json:"text"`
+	// Scene selects the upstream moderation scenario.
+	Scene int `json:"scene"`
+	// AreaTypes limits detection to the requested upstream area categories.
+	AreaTypes []int `json:"area_types,omitempty"`
+	// Way selects the upstream matching mode.
+	Way int `json:"way,omitempty"`
+	// Scenes contains additional upstream scene names.
+	Scenes []string `json:"scenes,omitempty"`
+}
+
+// TextScanResponse is the parsed response returned by POST /v1/text/scan.
+//
+// The upstream sensitive-word service owns most response fields, so Extra keeps
+// provider-specific fields available while Usage is decoded for gateway billing.
+type TextScanResponse struct {
+	// Usage contains gateway billing metadata injected by inference-gateway.
+	Usage *Usage `json:"usage,omitempty"`
+	// Extra contains upstream response fields that are not modeled by the SDK yet.
+	Extra map[string]any `json:"-"`
+}
+
+func (r *TextScanResponse) UnmarshalJSON(data []byte) error {
+	type alias TextScanResponse
+	var typed alias
+	if err := json.Unmarshal(data, &typed); err != nil {
+		return err
+	}
+
+	var extra map[string]any
+	if err := json.Unmarshal(data, &extra); err != nil {
+		return err
+	}
+	delete(extra, "usage")
+
+	*r = TextScanResponse(typed)
+	r.Extra = extra
+	return nil
+}
+
 // FaceScanRequest is the request body for POST /v1/face/scan.
 type FaceScanRequest struct {
 	// URI is the image or video URL to scan.

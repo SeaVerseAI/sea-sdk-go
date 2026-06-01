@@ -65,6 +65,12 @@ type ImageScanLabel = mmtypes.ImageScanLabel
 // ImageScanFrameResult describes one sampled frame in a video scan.
 type ImageScanFrameResult = mmtypes.ImageScanFrameResult
 
+// TextScanRequest is the request body for POST /v1/text/scan.
+type TextScanRequest = mmtypes.TextScanRequest
+
+// TextScanResponse is the parsed response returned by POST /v1/text/scan.
+type TextScanResponse = mmtypes.TextScanResponse
+
 // FaceScanRequest is the request body for POST /v1/face/scan.
 type FaceScanRequest = mmtypes.FaceScanRequest
 
